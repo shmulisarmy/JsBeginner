@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Lessons</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @keyframes appear {
+            from {
+                opacity: .5;
+                transform: translateY(-10px);
+            }
+            
+        }
+        #lesson-box {
+            animation: appear 0.5s ease-in-out;
+        }
+        :root {
+            --background-color: #f5f5f5;
+            --background-color-alpha: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --border-color: green;
+            --primary-color: #4CAF50;
+        }
+
+        .matrix-mode {
+            --background-color: #000;
+            --background-color-alpha: rgba(0, 0, 0, 0.9);
+            --text-color: lightgreen;
+            --border-color: white;
+            --primary-color: white;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            z-index: 999;
+            background-color: var(--background-color-alpha);
+            border-bottom: 2px solid var(--border-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .logo {
+            font-size: 1.5em;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .logo i {
+            margin-right: 8px;
+            color: var(--border-color);
+        }
+
+        .navbar .links {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar .links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1em;
+            transition: color 0.3s;
+        }
+
+        .navbar .links a:hover {
+            color: var(--border-color);
+        }
+
+        .navbar .toggle-mode {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1em;
+            transition: color 0.3s;
+        }
+
+        .navbar .toggle-mode:hover {
+            color: var(--border-color);
+        }
+
+        #lesson-box,
+        #user-box {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin: 20px;
+            transition: border-color 0.5s;
+        }
+
+        h1,
+        h2 {
+            color: var(--text-color);
+        }
+
+        pre,
+        code {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        /* Button styling */
+        button {
+            padding: 8px 16px;
+            font-size: 1em;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background-color: var(--border-color);
+            color: var(--background-color);
+        }
+    </style>
+</head>
+<!-- Include Prism CSS and JS for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+
+<body>
+
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">
+            <i class="fas fa-code"></i> JS Lessons
+        </div>
+        <div class="links">
+            <a href="#">Home</a>
+            <a href="#">Lessons</a>
+            <a href="#">Contact</a>
+        </div>
+        <button class="toggle-mode" onclick="toggleMatrixMode()">Toggle Matrix Mode</button>
+    </div>
+
+    <div id="lesson-box">
+        <h1 id="lesson-name">Lesson Title</h1>
+        <p id="lesson-goal">Lesson Goal</p>
+        <h2>Example Code:</h2>
+        <pre><code id="lesson-example-code" class="language-javascript"></code></pre>
+        <button onclick="runExampleCode()">Run Example Code</button>
+        <h2>Task:</h2>
+        <p id="lesson-users-task"></p>
+    </div>
+
+    <div id="user-box">
+        <h2>Your Code:</h2>
+        <pre><code  id="lesson-example-code" class="language-javascript users-code-display">console.log("Hello World");</code></pre>
+        <textarea oninput="document.querySelector('.users-code-display').textContent = this.value" id="user-code"
+            placeholder="Write your code here..." style="width: 100%; height: 80px;"></textarea>
+        <button onclick="runUserCode()"><strong style="color: var(--primary-color);">
+
+                Run My Code
+            </strong>
+            <small>
+
+                (Ctrl+Enter)
+            </small>
+        </button>
+        <button onclick="checkTask()">Submit</button>
+        <button onclick="peekCheatCode()">Peek at Cheat Code</button>
+        <button onclick="nextLesson()">Next Lesson</button>
+        <p id="feedback"></p>
+        <p id="cheat-code" style="display: none; color: red;"></p>
+        <div id="console-output"></div>
+    </div>
+
+    <script>
+        console.log = function(...args){
+            const output = document.getElementById("console-output");
+            output.textContent = args.join(" ") + "\n";
+            output.scrollTop = output.scrollHeight;
+        };
+        const keyboard_shortcuts = {
+            "runExampleCode": {
+                "keys": ["Control", "Enter"],
+                "callback": runExampleCode
+            }
+        }
+        const held_keys = new Set();
+        window.addEventListener("keydown", (event) => {
+            held_keys.add(event.key);
+            for (const shortcut in keyboard_shortcuts) {
+                const { keys, callback } = keyboard_shortcuts[shortcut];
+                if (keys.every(key => held_keys.has(key))) {
+                    callback();
+                }
+            }
+        })
+        window.addEventListener("keyup", (event) => {
+            held_keys.delete(event.key);
+        })
+        const lessons = [
+            {
+                name: "Hello World",
+                goal: "Display a message on a website using JavaScript.",
+                exampleCode: `alert("Hello World");`,
+                usersTask: "Write a code that will display 'hello puppy' on the screen",
+                cheat_code: "alert('hello puppy');",
+            },
+            {
+                name: "Simple Calculation",
+                goal: "Learn to perform simple calculations.",
+                exampleCode: `console.log(5 + 3);`,
+                usersTask: "Write code that adds 10 and 20 and displays the result",
+                cheat_code: "console.log(10 + 20);",
+            },
+            {
+                name: "Variables",
+                goal: "Learn to use variables in JavaScript.",
+                exampleCode: `let greeting = "Hello"; console.log(greeting);`,
+                usersTask: "Create a variable called 'name' with the value 'Puppy' and display it",
+                cheat_code: `let name = "Puppy"; console.log(name);`,
+            },
+            {
+                name: "If Statements",
+                goal: "Learn to use conditional statements.",
+                exampleCode: `if (5 > 3) { alert("5 is greater than 3"); }`,
+                usersTask: "Write an if statement that checks if 10 is greater than 5 and displays a message",
+                cheat_code: `if (10 > 5) { alert("10 is greater than 5"); }`,
+            }
+        ];
+
+        let currentLessonIndex = 0;
+
+        function doLesson(lesson) {
+            document.querySelector("#lesson-name").textContent = lesson.name;
+            document.querySelector("#lesson-goal").textContent = lesson.goal;
+            document.querySelector("#lesson-example-code").textContent = lesson.exampleCode;
+            document.querySelector("#lesson-users-task").textContent = lesson.usersTask;
+            Prism.highlightAll();
+        }
+
+        function runExampleCode() {
+            const exampleCode = lessons[currentLessonIndex].exampleCode;
+            eval(exampleCode);
+        }
+
+        function runUserCode() {
+            const userCode = document.querySelector("#user-code").value.trim();
+            eval(userCode);
+        }
+
+        function checkTask() {
+            const userCode = document.querySelector("#user-code").value.trim();
+            const feedback = document.querySelector("#feedback");
+
+            const lesson = lessons[currentLessonIndex];
+            if (userCode === lesson.cheat_code.trim()) {
+                feedback.textContent = "Correct! Well done!";
+                feedback.style.color = "green";
+            } else {
+                feedback.textContent = "Incorrect. Try again!";
+                feedback.style.color = "red";
+            }
+        }
+
+        function peekCheatCode() {
+            const cheatCodeElement = document.querySelector("#cheat-code");
+            const lesson = lessons[currentLessonIndex];
+            cheatCodeElement.textContent = `Cheat Code: ${lesson.cheat_code}`;
+            cheatCodeElement.style.display = "block";
+
+            setTimeout(() => {
+                cheatCodeElement.style.display = "none";
+            }, 3000);
+        }
+
+        function nextLesson() {
+            if (currentLessonIndex < lessons.length - 1) {
+                currentLessonIndex++;
+                doLesson(lessons[currentLessonIndex]);
+            } else {
+                alert("You have completed all lessons!");
+            }
+        }
+
+        function toggleMatrixMode() {
+            document.body.classList.toggle("matrix-mode");
+        }
+
+        doLesson(lessons[currentLessonIndex]);
+    </script>
+</body>
+
+</html>
